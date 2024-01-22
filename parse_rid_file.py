@@ -67,15 +67,15 @@ with open(str(log_file), newline="", encoding="ISO-8859-1") as filecsv:
 
      # add marker one by one on the map
      if(len(coords)!=0):
-          m = folium.Map(location=coords[-1],start_zoom=13,tiles=tileurl,attr='Mapbox')
+          m = folium.Map(location=coords[0],zoom_start=18,max_zoom = 100,tiles=tileurl,attr='Mapbox')
           for i in range(0,len(coords),int(marker_number)):
                folium.Marker(
                location=coords[i],
                popup=' Height: '+ str(height[i]) + '(m) ' +'Speed: '+str(speed[i])+ '(m/s) '+'Status: '+ str(status_drone[i])+' Time:'+str(time[i]) + " (s)",
                ).add_to(m)
 
-          folium.PolyLine(coords, color='red', weight=5).add_to(m)
-
+          folium.PolyLine(coords, color='red', weight=2).add_to(m)
+     
           print("Found: " + str(len(coords))+ " lines on this drone")
           print("Average speed: "+str(round(np.mean(speed),2))+" m/s")
           print("Average height: "+str(round(np.mean(height),2))+" m")
