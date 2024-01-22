@@ -12,4 +12,8 @@ And also a graph via plotly , of height , speed , status of the uav
 
 Since I have not tested whether the log is able to acquire data from several uavs at the same time , I have included the possibility to filter the data by drone ID as an argument , you will have to enter that as a  simple string .
 
+Comands :
+
+python parse_rid_file.py [file.csv] [ID_UAV] [NUMBER_OF_MARKER]
+
 Working in progress...
