@@ -10,10 +10,10 @@ In addition to the interactive map , the script will print the average of some d
 It will also print out how many transport packets were found , BT5 , BT4 or Beacon
 And also a graph via plotly , of height , speed , status of the uav
 
-Since I have not tested whether the log is able to acquire data from several uavs at the same time , I have included the possibility to filter the data by drone ID as an argument , you will have to enter that as a  simple string .
+Since I have not tested whether the log is able to acquire data from several uavs at the same time , I have included the possibility to filter the data by MAC ADDRESS as an argument , you will have to enter that as a  simple string .
 
 Comands :
 
-python parse_rid_file.py [file.csv] [ID_UAV] [NUMBER_OF_MARKER]
+python parse_rid_file.py [file.csv] [MAC_ADDRESS] [NUMBER_OF_MARKER] [SHOW_GRAPH(1/0)]
 
 Working in progress...
