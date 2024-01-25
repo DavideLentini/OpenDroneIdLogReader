@@ -194,8 +194,8 @@ with open(str(log_file), newline="", encoding="ISO-8859-1") as filecsv:
           fig.add_trace(go.Scatter(x=time, y=height, name='Height',
                          line=dict(color='pink', width=4)))
           fig.update_layout(title='Log of uav '+str(mac_address_arg),
-                   xaxis_title='Data',
-                   yaxis_title='Time(s)')
+                   xaxis_title='Time(s)',
+                   yaxis_title='Data')
           if(show_graph=="1"):
                fig.show()
                webbrowser.open_new_tab(str(mac_address_arg.replace(":","_"))+'.html')
