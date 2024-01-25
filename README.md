@@ -4,9 +4,10 @@ Simple and rudimentary ( for now ) , script in python that takes as input a .csv
 https://github.com/opendroneid/receiver-android
 
 The script via folium library , draws the path of the UAV on an interactive satellite map generated as an html file ( for illustration purpose I used the one from Google ) , 
-on the map there are also markers that can contain various information about the drone acquired at that precise moment , the number of markers you can decide via argument ( the more markers there are the heavier the html file will be ) .
+on the map there are also markers that can contain various information about the drone acquired at that precise moment , the number of markers you can decide via argument. The markers are simple circle figure , so even if you put a resolution of 1 circle/1 second , should be no problem in the view of the html file . 
+For example , i tested a log of 20 minutes , with 2091 lines . For a better view of the map , i inserted a condition that if the speed is < 0.10 , so the vehicle is not moving , i am not fully satisfied with this modification , and I would like to reduce the range somewhat and not completely the display , but for now it reduces the on-screen markers and lightens the display. The background colour of the marker dipends on the state of the drone , so green(ground),blue(airborne),red(emergency).
 
-In addition to the interactive map , the script will print the average of some data such as : height,speed,horizontal/vertical accuracy/speed,rssi,distance from uav
+In addition to the interactive map , the script will print the average,min,max of some data such as : height,speed,horizontal/vertical accuracy/speed,rssi,distance from uav
 It will also print out how many transport packets were found , BT5 , BT4 or Beacon
 And also a graph via plotly , of height , speed , status of the uav
 
