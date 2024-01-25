@@ -46,38 +46,55 @@ with open(str(log_file), newline="", encoding="ISO-8859-1") as filecsv:
      for line in lettore:
          
          #check if number is the id of the drone
+         
          if(mac_address_arg in line[3]):
            try:
-
-               temp_coords[0]=(float(line[20])*1e-7) #lat 
-               temp_coords[1]=(float(line[21])*1e-7) #lgn
-               time_real=round((float(line[29])/10),2)
-               time.append(time_real)
-               speed.append(float(line[18])/4)
-               height.append(float((line[24]))/1000)
-               rssi.append(float(line[4]))
-               bt_transport.append(line[2])
-               hor_acc.append(int(line[25]))
-               ver_acc.append(int(line[26]))
-               baro_acc.append(int(line[27]))
-               spd_acc.append(int(line[28]))
-               status_drone.append(int(line[13]))
-               mac_address.append(str(line[3]))
-               distance_from_drone.append(float(line[31]))
-               operator_id.append(str(line[47]))
-               category.append(str(int(line[42])))
-               class_value.append(str(int(line[43])))
-
+               if(str(line[20])!="" and str(line[21])!=""):
+                    temp_coords[0]=(float(line[20])*1e-7) #lat 
+                    temp_coords[1]=(float(line[21])*1e-7) #lgn
+               if(str(line[29])!=""):
+                    time_real=round((float(line[29])/10),2)
+                    time.append(time_real)
+               if(str(line[18])!=""):
+                    speed.append(float(line[18])/4)
+               if(str(line[24])!=""):
+                    height.append(float((line[24]))/1000)
+               if(str(line[4])!=""):
+                        rssi.append(float(line[4]))
+               if(str(line[2])!=""):
+                    bt_transport.append(line[2])
+               if(str(line[25])!=""):
+                    hor_acc.append(int(line[25]))
+               if(str(line[26])!=""):
+                    ver_acc.append(int(line[26]))
+               if(str(line[27])!=""):
+                    baro_acc.append(int(line[27]))
+               if(str(line[28])!=""):
+                    spd_acc.append(int(line[28]))
+               if(str(line[13])!=""):
+                    status_drone.append(int(line[13]))
+               if(str(line[3])!=""):
+                    mac_address.append(str(line[3]))
+               if(str(line[31])!=""):
+                    distance_from_drone.append(float(line[31]))
+               if(str(line[47])!=""):
+                    operator_id.append(str(line[47]))
+               if(str(line[42])!=""):
+                    category.append(str(int(line[42])))
+               if(str(line[43])!=""):
+                    class_value.append(str(int(line[43])))
 
                #print("ok")
 
 
            except:
+           
                continue
-           test=(str(temp_coords[0]))+' '+(str(temp_coords[1]))
-           result=string_to_float_array_method2(test)
-           #print(test)
-           coords.append(result)
+           if(str(line[20])!="" and str(line[21])!=""):
+                test=(str(temp_coords[0]))+' '+(str(temp_coords[1]))
+                result=string_to_float_array_method2(test)
+                #print(test)
+                coords.append(result)
 
 
 
@@ -85,11 +102,20 @@ with open(str(log_file), newline="", encoding="ISO-8859-1") as filecsv:
      # add marker one by one on the map
      if(len(coords)!=0):
           m = folium.Map(location=coords[0],zoom_start=18,max_zoom = 100,tiles=tileurl,attr='Mapbox')
-          for i in range(0,len(coords),int(marker_number)):
-               folium.Marker(
-               location=coords[i], icon=folium.Icon(color="blue",icon="location-dot", prefix='fa'),
-               popup=' Height: '+ str(height[i]) + '(m) ' +'Speed: '+str(speed[i])+ '(m/s) '+'Status: '+ str(status_drone[i])+' Time:'+str(time[i]) + " (s)",
-               ).add_to(m)
+
+          for i in range(1,len(coords)-2,int(marker_number)):
+                    folium.Marker(
+                     location=coords[i], icon=folium.Icon(color="blue",icon="location-dot", prefix='fa'),
+                     popup='Height: '+ str(height[i]) + '(m) ' +'Speed: '+str(speed[i])+ '(m/s) '+'Status: '+ str(status_drone[i])+' Time:'+str(time[i]) + " (s)",
+                     ).add_to(m)
+          folium.Marker(
+                   location=coords[0], icon=folium.Icon(color="green",icon="location-dot", prefix='fa'),
+                   popup=' START / Height: '+ str(height[0]) + '(m) ' +'Speed: '+str(speed[0])+ '(m/s) '+'Status: '+ str(status_drone[0])+' Time:'+str(time[0]) + " (s)",
+                   ).add_to(m)
+          folium.Marker(
+                   location=coords[len(coords)-1], icon=folium.Icon(color="red",icon="location-dot", prefix='fa'),
+                   popup=' END / Height: '+ str(height[1]) + '(m) ' +'Speed: '+str(speed[1])+ '(m/s) '+'Status: '+ str(status_drone[1])+' Time:'+str(len(coords)-1) + " (s)",
+                   ).add_to(m)
           folium.PolyLine(coords, color='red', weight=2).add_to(m)
           print("Found: " + str(len(coords))+ " lines on this drone")
           print("####TELEMETRY INFORMATION####")
@@ -138,7 +164,7 @@ with open(str(log_file), newline="", encoding="ISO-8859-1") as filecsv:
           print("On "+str(count_BT5+count_BT4+count_wifi)+ " packets in total "+ str(count_BT5) + " BT5 message were found and "+ str(count_BT4) + " BT4 message were found and " + str(count_wifi) + " Wifi message were found")
 
 
-          m.save(str(1)+'.html')
+          m.save(str(str(mac_address_arg.replace(":","_")))+'.html')
 
           fig = go.Figure()
           # Create and style traces
@@ -153,7 +179,7 @@ with open(str(log_file), newline="", encoding="ISO-8859-1") as filecsv:
                    yaxis_title='Time(s)')
           if(show_graph=="1"):
                fig.show()
-               webbrowser.open_new_tab(str(1)+'.html')
+               webbrowser.open_new_tab(str(mac_address_arg.replace(":","_"))+'.html')
           
      else:
          print("Error , no data found on this drone")
