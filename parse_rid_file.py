@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 import sys
 import webbrowser
 
+
 def string_to_float_array_method2(input_string):
      return list(map(float, input_string.split()))
 temp_coords=[0,0]
@@ -59,8 +60,8 @@ with open(str(log_file), newline="", encoding="ISO-8859-1") as filecsv:
                     speed.append(float(line[18])/4)
                if(str(line[24])!=""):
                     height.append(float((line[24]))/1000)
-               if(str(line[4])!=""):
-                        rssi.append(float(line[4]))
+               if(str(line[5])!=""):
+                        rssi.append(float(line[5]))
                if(str(line[2])!=""):
                     bt_transport.append(line[2])
                if(str(line[25])!=""):
@@ -104,10 +105,27 @@ with open(str(log_file), newline="", encoding="ISO-8859-1") as filecsv:
           m = folium.Map(location=coords[0],zoom_start=18,max_zoom = 100,tiles=tileurl,attr='Mapbox')
 
           for i in range(1,len(coords)-2,int(marker_number)):
-                    folium.Marker(
-                     location=coords[i], icon=folium.Icon(color="blue",icon="location-dot", prefix='fa'),
-                     popup='Height: '+ str(height[i]) + '(m) ' +'Speed: '+str(speed[i])+ '(m/s) '+'Status: '+ str(status_drone[i])+' Time:'+str(time[i]) + " (s)",
-                     ).add_to(m)
+                    if(speed[i]<0.10):
+                        continue
+                    else:
+                         if(status_drone[i]==1):
+                              folium.Circle(radius=0.5,fill_color="green", fill_opacity=0.8,
+                              location=coords[i],
+                              popup='Height: '+ str(height[i]) + '(m) ' +'Speed: '+str(speed[i])+ '(m/s) '+'Status: '+ str(status_drone[i])+' Time:'+str(time[i]) + " (s)",
+                              ).add_to(m)
+                         if(status_drone[i]==2):
+                              folium.Circle(radius=0.5,fill_color="blue", fill_opacity=0.8,
+                              location=coords[i],
+                              popup='Height: '+ str(height[i]) + '(m) ' +'Speed: '+str(speed[i])+ '(m/s) '+'Status: '+ str(status_drone[i])+' Time:'+str(time[i]) + " (s)",
+                              ).add_to(m)
+                         if(status_drone[i]==3):
+                              folium.Circle(radius=0.5,fill_color="red", fill_opacity=0.8,
+                              location=coords[i],
+                              popup='Height: '+ str(height[i]) + '(m) ' +'Speed: '+str(speed[i])+ '(m/s) '+'Status: '+ str(status_drone[i])+' Time:'+str(time[i]) + " (s)",
+                              ).add_to(m)
+
+
+
           folium.Marker(
                    location=coords[0], icon=folium.Icon(color="green",icon="location-dot", prefix='fa'),
                    popup=' START / Height: '+ str(height[0]) + '(m) ' +'Speed: '+str(speed[0])+ '(m/s) '+'Status: '+ str(status_drone[0])+' Time:'+str(time[0]) + " (s)",
@@ -117,18 +135,19 @@ with open(str(log_file), newline="", encoding="ISO-8859-1") as filecsv:
                    popup=' END / Height: '+ str(height[1]) + '(m) ' +'Speed: '+str(speed[1])+ '(m/s) '+'Status: '+ str(status_drone[1])+' Time:'+str(len(coords)-1) + " (s)",
                    ).add_to(m)
           folium.PolyLine(coords, color='red', weight=2).add_to(m)
-          print("Found: " + str(len(coords))+ " lines on this drone")
+          #AntPath(coords, delay=400, dash_array=[30,15], color="red", weight=3).add_to(m)
+
           print("####TELEMETRY INFORMATION####")
-          print("Average speed: "+str(round(np.mean(speed),2))+" m/s")
-          print("Average height: "+str(round(np.mean(height),2))+" m")
-          print("Average hor_acc: "+str(round(np.mean(hor_acc),2))+" m")
-          print("Average ver_acc: "+str(round(np.mean(ver_acc),2))+" m")
-          print("Average baro_acc: "+str(round(np.mean(baro_acc),2))+" m")
-          print("Average spd_acc: "+str(round(np.mean(spd_acc),2))+" m/s")
-          print("Average rssi: "+str(round(np.mean(rssi),2))+" db")
-          print("Average distance from uav: "+str(round(np.mean(distance_from_drone),2))+" m")
+          print("Average speed: "+str(round(np.mean(speed),2))+" m/s" + " |Min Speed: "+str(round(min(speed),2))+ " m/s "+" |Max Speed: "+str(round(max(speed),2))+ " m/s")
+          print("Average height: "+str(round(np.mean(height),2))+" m"+ " |Min height: "+str(round(min(height),2))+ " m "+" |Max height: "+str(round(max(height),2))+ " m")
+          print("Average hor_acc: "+str(round(np.mean(hor_acc),2))+" m"+ " |Min hor_acc: "+str(round(min(hor_acc),2))+ " m "+" |Max hor_acc: "+str(round(max(hor_acc),2))+ " m")
+          print("Average ver_acc: "+str(round(np.mean(ver_acc),2))+" m"+ " |Min ver_acc: "+str(round(min(ver_acc),2))+ " m "+" |Max ver_acc: "+str(round(max(ver_acc),2))+ " m")
+          print("Average baro_acc: "+str(round(np.mean(baro_acc),2))+" m"+ " |Min baro_acc: "+str(round(min(baro_acc),2))+ " m "+" |Max baro_acc: "+str(round(max(baro_acc),2))+ " m")
+          print("Average spd_acc: "+str(round(np.mean(spd_acc),2))+" m/s" + " |Min spd_acc: "+str(round(min(spd_acc),2))+ " m/s "+" |Max spd_acc: "+str(round(max(spd_acc),2))+ " m/s")
+          print("Average rssi: "+str(round(np.mean(rssi),2))+" db"+ " |Min db: "+ str(round(min(rssi),2))+ " db "+" |Max db: "+str(round(max(rssi),2))+ " db")
+          print("Average distance from uav: "+str(round(np.mean(distance_from_drone),2))+" m" + " |Min dist: "+str(round(min(distance_from_drone),2))+ " m"+" |Max dist: "+str(round(max(distance_from_drone),2))+ " m")
           #print average mac address
-          print("####INFORMATION ON UAV AND REMOTE ID ####")
+          print("####INFORMATION ON UAV AND REMOTE ID####")
           for a in range(0,len(mac_address)):
               count_mac_address.append(mac_address.count(a))
           most_frequent_mac = mac_address[count_mac_address.index(max(count_mac_address))]
