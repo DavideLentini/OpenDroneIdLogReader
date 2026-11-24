@@ -6,9 +6,25 @@ import plotly.graph_objects as go
 import sys
 import webbrowser
 
+try:
+     import remoteid
+except ImportError:
+     remoteid=None
+
 
 def string_to_float_array_method2(input_string):
      return list(map(float, input_string.split()))
+
+def transport_hint(transport,payload):
+     # map the log transport type to the hint expected by remoteid
+     if("BT4" in transport or "BT5" in transport):
+          return "ble_adv",payload
+     if("Beacon" in transport):
+          return "payload",payload[1:] # first byte is the message counter
+     if("NAN" in transport):
+          return "nan",payload
+     return None,None
+
 temp_coords=[0,0]
 count=0
 coords=[]
@@ -36,6 +52,18 @@ log_file=sys.argv[1]
 mac_address_arg=sys.argv[2]
 marker_number=sys.argv[3]
 show_graph=sys.argv[4]
+show_trust=sys.argv[5] if len(sys.argv)>5 else "0"
+
+trust_tracker=None
+trust_count=0
+trust_alerts=0
+if(show_trust=="1"):
+     if(remoteid is None):
+          print("remoteid package is not installed , trust analysis disabled ( pip install remoteid )")
+          show_trust="0"
+     else:
+          # the log is replayed after the fact , so transmitters must not expire
+          trust_tracker=remoteid.Tracker(timeout_ms=10**12)
 
 tileurl = 'http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}'
 
@@ -84,6 +112,25 @@ with open(str(log_file), newline="", encoding="ISO-8859-1") as filecsv:
                     category.append(str(int(line[42])))
                if(str(line[43])!=""):
                     class_value.append(str(int(line[43])))
+               if(show_trust=="1" and str(line[6])!=""):
+                    try:
+                         payload=bytes(int(b,16) for b in str(line[6]).split())
+                         hint,data=transport_hint(str(line[2]),payload)
+                         if(hint is not None):
+                              if(str(line[1])!=""):
+                                   now_ms=int(float(line[1])//1000000)
+                              else:
+                                   now_ms=None
+                              if(str(line[5])!=""):
+                                   rssi_value=int(float(line[5]))
+                              else:
+                                   rssi_value=None
+                              v=trust_tracker.ingest(data,hint,address=str(line[3]),rssi=rssi_value,now_ms=now_ms)
+                              trust_count+=1
+                              if(v.is_alert):
+                                   trust_alerts+=1
+                    except:
+                         pass
 
                #print("ok")
 
@@ -202,3 +249,9 @@ with open(str(log_file), newline="", encoding="ISO-8859-1") as filecsv:
           
      else:
          print("Error , no data found on this drone")
+
+if(show_trust=="1" and trust_tracker is not None):
+     print("####TRUST ANALYSIS####")
+     print("Analyzed "+str(trust_count)+" raw advertisement payloads from the log , "+str(trust_alerts)+" raised an alert")
+     for v in trust_tracker.verdicts():
+          print("UAV "+str(v.address)+" -> verdict: "+str(v.verdict)+" |uas_id: "+str(v.uas_id)+" |reasons: "+str(v.reasons))
