@@ -15,6 +15,8 @@ Since I have not tested whether the log is able to acquire data from several uav
 
 Comands :
 
-python parse_rid_file.py [file.csv] [MAC_ADDRESS] [NUMBER_OF_MARKER] [SHOW_GRAPH(1/0)]
+python parse_rid_file.py [file.csv] [MAC_ADDRESS] [NUMBER_OF_MARKER] [SHOW_GRAPH(1/0)] [TRUST(1/0)]
+
+The last argument is optional ( default 0 ) . If set to 1 , the raw advertisement payloads stored in the log ( the "payload" column ) are replayed through the remoteid package ( pip install remoteid , https://github.com/Mattbusel/remoteid ) , which checks each transmitter for signs of spoofing or tampering . At the end a TRUST ANALYSIS section is printed with a verdict ( plausible , suspicious , spoofed , authenticated ) and the reasons for every UAV found in the log . If the package is not installed the analysis is skipped and the script works as before .
 
 Working in progress...
